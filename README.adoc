@@ -1,0 +1,24 @@
+= Echo + Swagger
+
+This is my first try with Echo & Swagger
+
+
+== Run Test
+    go test tests/*test.go -count=1
+
+`-count=1`
+
+== Run the API backend
+The commands below generate swagger documentation and run the server.
+
+    swag init -g main.go && go run main.go
+
+Go to the web browser and open: `http://localhost:8080`
+
+== API
+
+|===
+| Resource Path      | Description
+
+| swagger/index.html | Open the API documentation
+| v1/user/<id>       | Get a user based on an ID
