@@ -50,6 +50,9 @@ func main() {
 	v1 := e.Group("/v1")
 	{
 		v1.GET("/user/:id", handlers.GetUser)
+		v1.POST("/user", handlers.CreateUser)
+		v1.PUT("/user", handlers.UpdateUser)
+		v1.DELETE("/user/:id", handlers.DeleteUser)
 	}
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)

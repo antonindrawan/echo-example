@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetUser(t *testing.T) {
+func TestGetUserNotExist(t *testing.T) {
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
@@ -21,7 +21,6 @@ func TestGetUser(t *testing.T) {
 	context.SetParamValues("42")
 
 	if assert.NoError(t, handlers.GetUser(context)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
-		assert.Equal(t, `{"id":"42"}`+"\n", rec.Body.String())
+		assert.Equal(t, http.StatusNotFound, rec.Code)
 	}
 }

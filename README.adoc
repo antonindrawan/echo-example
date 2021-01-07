@@ -6,7 +6,6 @@ This is my first try with Echo & Swagger
 == Run Test
     go test tests/*test.go -count=1
 
-`-count=1`
 
 == Run the API backend
 The commands below generate swagger documentation and run the server.
