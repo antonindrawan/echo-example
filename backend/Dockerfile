@@ -9,8 +9,11 @@ ADD . ${GOPATH}/src/${APP}
 WORKDIR ${GOPATH}/src/${APP}
 
 # Build with removing the symbols and debug info
-RUN go build -ldflags "-s -w" -mod vendor -o app
+RUN go mod verify && \
+    go get github.com/swaggo/swag/cmd/swag
 
+RUN swag init -g main.go && \
+    go build -ldflags "-s -w" -mod vendor -o app
 
 # Stage 2: Only copy the compiled binary and config to run the backend
 FROM alpine:3.12.3

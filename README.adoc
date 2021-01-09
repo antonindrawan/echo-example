@@ -4,15 +4,30 @@ This is my first try with Echo & Swagger
 
 
 == Run Test
-    go test tests/*test.go -count=1
+    cd backend
+    go test tests/ -count=1
 
 
 == Run the API backend
 The commands below generate swagger documentation and run the server.
 
+    cd backend
     swag init -g main.go && go run main.go
 
 Go to the web browser and open: `http://localhost:8080`
+
+== Use Docker
+
+To build the image and start the container, run the following command:
+
+    docker-compose up
+
+
+To stop and delete the container, run the following command:
+
+    docker-compose down
+
+
 
 == API
 
@@ -20,4 +35,3 @@ Go to the web browser and open: `http://localhost:8080`
 | Resource Path      | Description
 
 | swagger/index.html | Open the API documentation
-| v1/user/<id>       | Get a user based on an ID

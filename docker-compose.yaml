@@ -1,0 +1,8 @@
+version: '3'
+services:
+  backedn:
+    build: backend/
+    image: echo-example_api:0.1
+    container_name: echo-example_api
+    ports:
+      - 8080:8080
