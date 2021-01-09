@@ -1,8 +1,10 @@
 version: '3'
 services:
-  backedn:
+  backend:
     build: backend/
     image: echo-example_api:0.1
     container_name: echo-example_api
     ports:
       - 8080:8080
+    env_file:
+      - backend/config/backend-variables.env

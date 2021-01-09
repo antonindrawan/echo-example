@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	_ "echo-example/docs"
 	handlers "echo-example/handlers"
@@ -28,11 +29,21 @@ var login = `
 	</script>
 	<script>
 		function onSignIn(googleUser) {
-			var profile = googleUser.getBasicProfile();
-			console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-			console.log('Name: ' + profile.getName());
-			console.log('Image URL: ' + profile.getImageUrl());
-			console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+			fetch('/auth', {
+				method: 'POST',
+				headers: {
+					'Authorization': 'Bearer ' + googleUser.getAuthResponse().id_token
+				}
+			}).then(function (response) {
+				if (response.ok) {
+					return response.text();
+				}
+				return Promise.reject(response);
+			}).then(function (data) {
+				console.log(data);
+			}).catch(function (error) {
+				console.warn('Something went wrong.', error);
+			});
 		}
 		function signOut() {
 			var auth2 = gapi.auth2.getAuthInstance();
@@ -43,7 +54,7 @@ var login = `
 
 	</script>
 	<html lang="en">
-	<meta name="google-signin-client_id" content="913549998475-dggku238g8m65v0rpumofeidu6n8s5qr.apps.googleusercontent.com">
+	<meta name="google-signin-client_id" content="` + os.Getenv("APPLICATION_CLIENT_ID") + `">
 	<div class="g-signin2" data-onsuccess="onSignIn"></div>
 	<a href="#" onclick="signOut();">Sign out</a>
 `
@@ -73,6 +84,8 @@ func main() {
 	e.GET("/login", func(c echo.Context) error {
 		return c.HTML(http.StatusOK, login)
 	})
+	e.POST("/auth", handlers.Login)
+
 	v1 := e.Group("/v1")
 	{
 		v1.GET("/user/:id", handlers.GetUser)

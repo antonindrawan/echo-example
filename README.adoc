@@ -12,14 +12,17 @@ This is my first try with Echo & Swagger
 The commands below generate swagger documentation and run the server.
 
     cd backend
-    swag init -g main.go && go run main.go
+    swag init -g main.go && APPLICATION_CLIENT_ID=<google-client-id> go run main.go
 
 Go to the web browser and open: `http://localhost:8080`
 
 == Use Docker
 
+Create `./backend/config/backend-variables.env` based on the template `./backend/config/backend-variables.env.in`
+
 To build the image and start the container, run the following command:
 
+    docker-compose build
     docker-compose up
 
 
@@ -28,10 +31,12 @@ To stop and delete the container, run the following command:
     docker-compose down
 
 
-
 == API
 
 |===
 | Resource Path      | Description
 
 | swagger/index.html | Open the API documentation
+| login              | Ask the user to sign-in using google (front end)
+| auth (POST)        | Authenticate with an id token (back end).
+                       It is called automatically after a successful login.
