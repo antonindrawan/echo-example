@@ -23,6 +23,31 @@ var index = `
 	</body>
 `
 
+var login = `
+	<script src="https://apis.google.com/js/platform.js" async defer>
+	</script>
+	<script>
+		function onSignIn(googleUser) {
+			var profile = googleUser.getBasicProfile();
+			console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+			console.log('Name: ' + profile.getName());
+			console.log('Image URL: ' + profile.getImageUrl());
+			console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+		}
+		function signOut() {
+			var auth2 = gapi.auth2.getAuthInstance();
+			auth2.signOut().then(function () {
+				console.log('User signed out.');
+			});
+		}
+
+	</script>
+	<html lang="en">
+	<meta name="google-signin-client_id" content="913549998475-dggku238g8m65v0rpumofeidu6n8s5qr.apps.googleusercontent.com">
+	<div class="g-signin2" data-onsuccess="onSignIn"></div>
+	<a href="#" onclick="signOut();">Sign out</a>
+`
+
 // @title Echo Example
 // @description This is an echo application
 // @version 1.0
@@ -42,11 +67,12 @@ func main() {
 	}))
 
 	e.GET("/", func(c echo.Context) error {
-		return c.HTML(http.StatusOK, `<h1>Hello World! <a href=swagger/index.html>See the swagger doc</a></h1>
-			<br/> Build with <a href=https://echo.labstack.com>echo</a>
-			and <a href=https://github.com/swaggo/echo-swagger>echo-swagger</a>`)
+		return c.HTML(http.StatusOK, index)
 	})
 
+	e.GET("/login", func(c echo.Context) error {
+		return c.HTML(http.StatusOK, login)
+	})
 	v1 := e.Group("/v1")
 	{
 		v1.GET("/user/:id", handlers.GetUser)
