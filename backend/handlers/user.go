@@ -15,9 +15,9 @@ var (
 )
 
 // GetUser godoc
-// @Summary Get a user
+// @Summary Get a user based on an {id}.
 // @Description Get a user based on an {id}.
-// @Param id path string true "Get User"
+// @Param id path string true "User ID"
 // @Success 200 {object} object
 // @Failure 404 {object} object "Error message"
 // @Router /user/{id} [get]

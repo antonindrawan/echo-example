@@ -29,7 +29,7 @@ var login = `
 	</script>
 	<script>
 		function onSignIn(googleUser) {
-			fetch('/auth', {
+			fetch('/v1/auth', {
 				method: 'POST',
 				headers: {
 					'Authorization': 'Bearer ' + googleUser.getAuthResponse().id_token
@@ -62,7 +62,8 @@ var login = `
 // @title Echo Example
 // @description This is an echo application
 // @version 1.0
-// @host localhost:8080
+// @license.name MIT
+
 // @BasePath /v1
 func main() {
 	e := echo.New()
@@ -81,17 +82,20 @@ func main() {
 		return c.HTML(http.StatusOK, index)
 	})
 
-	e.GET("/login", func(c echo.Context) error {
-		return c.HTML(http.StatusOK, login)
-	})
-	e.POST("/auth", handlers.Login)
-
 	v1 := e.Group("/v1")
 	{
-		v1.GET("/user/:id", handlers.GetUser)
-		v1.POST("/user", handlers.CreateUser)
-		v1.PUT("/user", handlers.UpdateUser)
-		v1.DELETE("/user/:id", handlers.DeleteUser)
+		v1.GET("/login", func(c echo.Context) error {
+			return c.HTML(http.StatusOK, login)
+		})
+		v1.POST("/auth", handlers.Login)
+
+		user := v1.Group("/user")
+		{
+			user.GET("/:id", handlers.GetUser)
+			user.POST("", handlers.CreateUser)
+			user.PUT("", handlers.UpdateUser)
+			user.DELETE("/:id", handlers.DeleteUser)
+		}
 	}
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
