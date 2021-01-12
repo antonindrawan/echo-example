@@ -82,20 +82,30 @@ func main() {
 		return c.HTML(http.StatusOK, index)
 	})
 
-	v1 := e.Group("/v1")
+	// Unauthenticated routes
+	publicRoutes := e.Group("/v1")
 	{
-		v1.GET("/login", func(c echo.Context) error {
+		publicRoutes.GET("/login", func(c echo.Context) error {
 			return c.HTML(http.StatusOK, login)
 		})
-		v1.POST("/auth", handlers.Login)
 
-		user := v1.Group("/user")
+		user := publicRoutes.Group("/user")
 		{
 			user.GET("/:id", handlers.GetUser)
 			user.POST("", handlers.CreateUser)
 			user.PUT("", handlers.UpdateUser)
 			user.DELETE("/:id", handlers.DeleteUser)
 		}
+	}
+
+	// Restricted routes
+	protectedRoutes := e.Group("/v1")
+	{
+		config := middleware.JWTConfig{
+			KeyFunc: handlers.GetKey,
+		}
+		protectedRoutes.Use(middleware.JWTWithConfig(config))
+		protectedRoutes.POST("/auth", handlers.Login)
 	}
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)

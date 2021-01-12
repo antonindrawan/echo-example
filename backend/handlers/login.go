@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -21,8 +20,10 @@ type cachedGoogleOauth2Certs struct {
 var publicKeysURL = "https://www.googleapis.com/oauth2/v3/certs"
 var cachedCerts cachedGoogleOauth2Certs
 
-func getKey(token *jwt.Token) (interface{}, error) {
-
+// GetKey godoc
+// @Summary This function returns the key used to verify the given token.
+// @Param token header string true "Unverified token"
+func GetKey(token *jwt.Token) (interface{}, error) {
 	t := time.Now()
 	elapsed := t.Sub(cachedCerts.downloadedAt)
 
@@ -66,18 +67,7 @@ func getKey(token *jwt.Token) (interface{}, error) {
 // @Failure 401 {string} string "Unauthorized user"
 // @Router /auth [post]
 func Login(c echo.Context) error {
-	// curl -X POST -H "Authorization: Bearer <TOKEN>" http://localhost:8080/auth
-
-	// TODO: check https://echo.labstack.com/middleware/key-auth
-	authorization_header := c.Request().Header.Get("Authorization")
-	idToken := strings.Replace(authorization_header, "Bearer ", "", 1)
-
-	// Verify the integrity of the ID token (including the expiry time)
-	token, err := jwt.Parse(idToken, getKey)
-
-	if err != nil {
-		return c.String(http.StatusUnauthorized, err.Error())
-	}
+	token := c.Get("user").(*jwt.Token)
 
 	// do something with decoded claims
 	claims := token.Claims.(jwt.MapClaims)
