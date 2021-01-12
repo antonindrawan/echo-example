@@ -88,24 +88,24 @@ func main() {
 		publicRoutes.GET("/login", func(c echo.Context) error {
 			return c.HTML(http.StatusOK, login)
 		})
-
-		user := publicRoutes.Group("/user")
-		{
-			user.GET("/:id", handlers.GetUser)
-			user.POST("", handlers.CreateUser)
-			user.PUT("", handlers.UpdateUser)
-			user.DELETE("/:id", handlers.DeleteUser)
-		}
 	}
 
 	// Restricted routes
 	protectedRoutes := e.Group("/v1")
 	{
 		config := middleware.JWTConfig{
-			KeyFunc: handlers.GetKey,
+			KeyFunc: handlers.GetKey, // https://github.com/labstack/echo/issues/1731
 		}
 		protectedRoutes.Use(middleware.JWTWithConfig(config))
 		protectedRoutes.POST("/auth", handlers.Login)
+
+		user := protectedRoutes.Group("/user")
+		{
+			user.GET("/:id", handlers.GetUser)
+			user.POST("", handlers.CreateUser)
+			user.PUT("", handlers.UpdateUser)
+			user.DELETE("/:id", handlers.DeleteUser)
+		}
 	}
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
