@@ -26,8 +26,6 @@ var cachedCerts cachedGoogleOauth2Certs
 func GetKey(token *jwt.Token) (interface{}, error) {
 	t := time.Now()
 	elapsed := t.Sub(cachedCerts.downloadedAt)
-
-	// Download every hour
 	if cachedCerts.data == nil || int(elapsed.Minutes()) >= 60 {
 		fmt.Println("Public keys are not available or older than 1 hour. Downloading them from " + publicKeysURL)
 
@@ -84,6 +82,10 @@ func Login(c echo.Context) error {
 	issuer := claims["iss"]
 	if (issuer != "https://accounts.google.com") && (issuer != "accounts.google.com") {
 		return c.String(http.StatusUnauthorized, "Untrusted issuer")
+	}
+
+	if claims["email_verified"] != "true" {
+		return c.String(http.StatusUnauthorized, "Email is not verified")
 	}
 
 	return c.String(http.StatusOK, "Verified")
