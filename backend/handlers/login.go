@@ -84,7 +84,7 @@ func Login(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "Untrusted issuer")
 	}
 
-	if claims["email_verified"] != "true" {
+	if claims["email_verified"] != true {
 		return c.String(http.StatusUnauthorized, "Email is not verified")
 	}
 
