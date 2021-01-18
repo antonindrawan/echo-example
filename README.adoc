@@ -16,6 +16,11 @@ The commands below generate swagger documentation and run the server.
 
 Go to the web browser and open: `http://localhost:8080`
 
+Notes:
+
+* The google-client-id (or OAuth 2.0 Client ID) must be registered on https://console.developers.google.com/
+* In the Credentials section, the Authorised JavaScript origins must be set to http://localhost:8080 or your FQDN on which the web app is deployed.
+
 == Use Docker
 
 Create `./backend/config/backend-variables.env` based on the template `./backend/config/backend-variables.env.in`
