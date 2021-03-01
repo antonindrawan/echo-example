@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,7 +15,7 @@ import (
 
 type cachedGoogleOauth2Certs struct {
 	downloadedAt time.Time
-	data         *jwk.Set
+	keySet       jwk.Set
 }
 
 var publicKeysURL = "https://www.googleapis.com/oauth2/v3/certs"
@@ -26,15 +27,15 @@ var cachedCerts cachedGoogleOauth2Certs
 func GetKey(token *jwt.Token) (interface{}, error) {
 	t := time.Now()
 	elapsed := t.Sub(cachedCerts.downloadedAt)
-	if cachedCerts.data == nil || int(elapsed.Minutes()) >= 60 {
+	if cachedCerts.keySet == nil || int(elapsed.Minutes()) >= 60 {
 		fmt.Println("Public keys are not available or older than 1 hour. Downloading them from " + publicKeysURL)
 
-		set, err := jwk.FetchHTTP(publicKeysURL)
+		keySet, err := jwk.Fetch(context.Background(), publicKeysURL)
 		if err != nil {
 			return nil, err
 		}
 
-		cachedCerts.data = set
+		cachedCerts.keySet = keySet
 		cachedCerts.downloadedAt = time.Now()
 	}
 
@@ -43,14 +44,14 @@ func GetKey(token *jwt.Token) (interface{}, error) {
 		return nil, errors.New("expecting JWT header to have string kid")
 	}
 
-	key := cachedCerts.data.LookupKeyID(keyID)
+	key, found := cachedCerts.keySet.LookupKeyID(keyID)
 
-	if len(key) == 0 {
+	if !found {
 		return nil, fmt.Errorf("unable to find key %q", keyID)
 	}
 
 	var pubkey interface{}
-	if err := key[0].Raw(&pubkey); err != nil {
+	if err := key.Raw(&pubkey); err != nil {
 		return nil, fmt.Errorf("Unable to get the public key. Error: %s", err.Error())
 	}
 

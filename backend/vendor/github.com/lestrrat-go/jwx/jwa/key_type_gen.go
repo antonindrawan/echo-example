@@ -15,9 +15,22 @@ type KeyType string
 const (
 	EC             KeyType = "EC"  // Elliptic Curve
 	InvalidKeyType KeyType = ""    // Invalid KeyType
+	OKP            KeyType = "OKP" // Octet string key pairs
 	OctetSeq       KeyType = "oct" // Octet sequence (used to represent symmetric keys)
 	RSA            KeyType = "RSA" // RSA
 )
+
+var allKeyTypes = []KeyType{
+	EC,
+	OKP,
+	OctetSeq,
+	RSA,
+}
+
+// KeyTypes returns a list of all available values for KeyType
+func KeyTypes() []KeyType {
+	return allKeyTypes
+}
 
 // Accept is used when conversion from values given by
 // outside sources (such as JSON payloads) is required
@@ -38,7 +51,7 @@ func (v *KeyType) Accept(value interface{}) error {
 		tmp = KeyType(s)
 	}
 	switch tmp {
-	case EC, OctetSeq, RSA:
+	case EC, OKP, OctetSeq, RSA:
 	default:
 		return errors.Errorf(`invalid jwa.KeyType value`)
 	}
